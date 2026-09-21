@@ -9,4 +9,4 @@
 
 **File:** `default_of_credit_card_clients.csv` — converted from the source `.xls` (header row 2, `ID` column preserved, target column renamed from `default payment next month` to `default_payment_next_month`); values are otherwise unchanged. 30,000 rows, 25 columns, ~2.8 MB.
 
-**Columns:** `ID`; `LIMIT_BAL` (credit limit, NT$); `SEX`, `EDUCATION`, `MARRIAGE`, `AGE` (demographic — protected attributes, see `.ai/PROJECT_SPEC.md`); `PAY_0, PAY_2–PAY_6` (repayment status, past 6 months); `BILL_AMT1–6`, `PAY_AMT1–6` (bill and payment amounts, past 6 months); `default_payment_next_month` (target, 1 = default). No direct customer identifiers.
+**Columns:** `ID`; `LIMIT_BAL` (credit limit, NT$); `SEX`, `EDUCATION`, `MARRIAGE`, `AGE` (demographic fields retained for audit and excluded from model features); `PAY_0, PAY_2–PAY_6` (repayment status, past 6 months); `BILL_AMT1–6`, `PAY_AMT1–6` (bill and payment amounts, past 6 months); `default_payment_next_month` (target, 1 = default). No direct customer identifiers.

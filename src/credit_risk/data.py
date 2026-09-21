@@ -2,7 +2,7 @@
 
 Protected attributes (SEX, AGE, MARRIAGE, EDUCATION) are excluded from model
 features to avoid disparate treatment, but are kept alongside the test set
-for the fairness audit in notebooks/02_models.ipynb. See ../../.ai/PROJECT_SPEC.md.
+for the fairness audit notebooks.
 """
 
 from __future__ import annotations

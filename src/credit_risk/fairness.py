@@ -1,10 +1,4 @@
-"""Fairness audit: error-rate parity and calibration by protected group.
-
-Method follows the C30 (COMPAS/ProPublica) framing: report both the
-error-rate view (FPR/FNR by group) and the calibration view (predicted vs.
-observed default rate by group), and name the tension between them rather
-than picking one as "the" fairness metric.
-"""
+"""Fairness audit: approval parity, error-rate parity, and calibration by group."""
 
 from __future__ import annotations
 
@@ -56,6 +50,60 @@ def group_calibration(
         table["group"] = g
         rows.append(table.reset_index(drop=True))
     return pd.concat(rows, ignore_index=True)
+
+
+def approval_fairness_table(
+    y_true: np.ndarray,
+    y_score: np.ndarray,
+    threshold: float,
+    group: pd.Series,
+    reference: str | int | None = None,
+) -> pd.DataFrame:
+    """Approval rate, disparate-impact ratio, TPR, and calibration by group.
+
+    Scores are probabilities of default. Accounts below the threshold are
+    approved; accounts at or above the threshold are declined. TPR is measured
+    for the adverse outcome detection task: the share of true defaults that
+    are correctly declined.
+    """
+
+    df = pd.DataFrame({"y": y_true, "score": y_score, "group": group.to_numpy()})
+    df["approved"] = df["score"] < threshold
+    df["declined"] = ~df["approved"]
+    rows = []
+    for group_value, sub in df.groupby("group", observed=True):
+        positives = sub[sub["y"] == 1]
+        tpr = positives["declined"].mean() if len(positives) else np.nan
+        rows.append(
+            {
+                "group": group_value,
+                "n": int(len(sub)),
+                "approval_rate": float(sub["approved"].mean()),
+                "actual_default_rate": float(sub["y"].mean()),
+                "mean_predicted_pd": float(sub["score"].mean()),
+                "calibration_error": float(sub["score"].mean() - sub["y"].mean()),
+                "true_positive_rate": float(tpr),
+            }
+        )
+
+    table = pd.DataFrame(rows).sort_values("group").reset_index(drop=True)
+    if reference is None:
+        reference_rate = float(table["approval_rate"].max())
+    else:
+        ref = table.loc[table["group"].astype(str).eq(str(reference)), "approval_rate"]
+        if ref.empty:
+            raise ValueError(f"Reference group {reference!r} is not present")
+        reference_rate = float(ref.iloc[0])
+
+    table["disparate_impact_ratio"] = table["approval_rate"] / reference_rate
+    table["di_flag_below_0_8"] = table["disparate_impact_ratio"] < 0.8
+    return table
+
+
+def true_positive_rate_gap(table: pd.DataFrame) -> float:
+    """Max-minus-min true positive rate gap, ignoring empty groups."""
+
+    return float(table["true_positive_rate"].max() - table["true_positive_rate"].min())
 
 
 def bucket_age(age: pd.Series) -> pd.Series:

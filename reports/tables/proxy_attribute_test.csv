@@ -1,0 +1,7 @@
+model,attribute,min_disparate_impact_ratio,any_di_flag_below_0_8,tpr_gap
+protected_excluded_candidate,SEX,0.9144330508942993,False,0.0023136338288860525
+protected_excluded_candidate,AGE band,0.7618046250519799,True,0.1313559322033898
+protected_excluded_candidate,MARRIAGE,0.7818494424984281,True,0.3076923076923077
+protected_included_test,SEX,0.8564690406462201,False,0.03323327361389594
+protected_included_test,AGE band,0.7011720019352836,True,0.08247339998930647
+protected_included_test,MARRIAGE,0.5622489959839357,True,0.8083756345177665

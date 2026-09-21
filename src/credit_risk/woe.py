@@ -31,7 +31,7 @@ class WoeBinner:
         edges = self.bin_edges_[feature]
         return pd.Series(np.digitize(series.to_numpy(dtype=float), edges[1:-1]), index=series.index)
 
-    def fit(self, X: pd.DataFrame, y: pd.Series) -> "WoeBinner":
+    def fit(self, X: pd.DataFrame, y: pd.Series) -> WoeBinner:
         n_good = int((y == 0).sum())
         n_bad = int((y == 1).sum())
 
