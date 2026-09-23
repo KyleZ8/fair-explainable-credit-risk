@@ -13,7 +13,7 @@ Compare the scorecard and challenger → explain decisions → audit fairness �
 
 The best-performing model is XGBoost, but the business decision is not "use a 0.5 cutoff."
 
-On the 7,500-account held-out set, XGBoost beats the WoE scorecard on ranking power (`AUC 0.7835`, `KS 0.4365`). A cost-based approval threshold of `0.151` cuts expected cost from `0.7263` to `0.5473` per account and raises expected profit from `0.0525` to `0.2315`, while reducing the approved-book default rate from `15.7%` to `9.4%`.
+On the 7,500-account held-out set, XGBoost beats the WoE scorecard on ranking power (`AUC 0.7835`, `KS 0.4365`). A cost-based approval threshold of `0.151` cuts expected cost from `0.7263` to `0.5473` model cost units per account and raises expected profit from `0.0525` to `0.2315`, while reducing the approved-book default rate from `15.7%` to `9.4%`.
 
 The tradeoff is real: approval rate falls from `87.5%` to `53.1%`, and the fairness audit flags AGE band and MARRIAGE approval-rate parity for monitoring.
 
@@ -21,6 +21,8 @@ The tradeoff is real: approval rate falls from `87.5%` to `53.1%`, and the fairn
 |---|---:|---:|---:|---:|---:|
 | Naive 0.5 cutoff | 0.5000 | 87.5% | 15.7% | 0.7263 | 0.0525 |
 | Cost-based threshold | 0.1508 | 53.1% | 9.4% | 0.5473 | 0.2315 |
+
+Cost/profit values are per account in model cost units: one approved default costs 5 units and one wrongly declined good account costs 1 unit. In units of one default's loss, divide the table values by 5. For example, at a €4,000 average loss per default and 1,000 applicants, the cost-based threshold's expected profit is `0.2315 / 5 * €4,000 * 1,000 = €185,200`, versus €42,000 at the naive 0.5 cutoff.
 
 ![Cost threshold curve](reports/figures/cost_threshold_curve.png)
 
@@ -35,7 +37,7 @@ The tradeoff is real: approval rate falls from `87.5%` to `53.1%`, and the fairn
 
 ![ROC curve](reports/figures/roc_curve.png)
 
-The scorecard's top IV feature is `PAY_0` (`0.8628`). XGBoost's global SHAP-style contribution view agrees: `PAY_0` is the strongest driver (`0.4706` mean absolute contribution), followed by `LIMIT_BAL`, `BILL_AMT1`, and recent payment amounts.
+The scorecard's top IV feature is `PAY_0` (`0.8628`). XGBoost's global SHAP contribution view agrees: `PAY_0` is the strongest driver (`0.4706` mean absolute SHAP contribution), followed by `LIMIT_BAL`, `BILL_AMT1`, and recent payment amounts.
 
 ![SHAP global importance](reports/figures/shap_global_importance.png)
 
@@ -50,7 +52,7 @@ For declined applicant `ID 10745`, the model estimates `88.5%` probability of de
 3. Recent bill balance is high relative to the portfolio pattern.
 4. Six-month repayment status shows delinquency or delayed payment.
 
-These are generated from XGBoost contribution values in `notebooks/03_explainability.ipynb`, not hand-written after the fact.
+These are generated from XGBoost SHAP contribution values in `notebooks/03_explainability.ipynb`, not hand-written after the fact.
 
 ---
 
@@ -141,3 +143,5 @@ tests/      fast known-answer tests
 ## License
 
 MIT
+
+Part of a six-project data analytics portfolio — see [github.com/KyleZ8](https://github.com/KyleZ8)

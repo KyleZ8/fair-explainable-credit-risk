@@ -24,7 +24,7 @@ Held-out test results:
 | Logistic scorecard | 0.7752 | 0.4191 | 0.5504 |
 | XGBoost | 0.7835 | 0.4365 | 0.5670 |
 
-The strongest scorecard IV feature is `PAY_0` (`0.8628`), followed by prior repayment-status variables. SHAP-style global importance for XGBoost also ranks `PAY_0` first (`0.4706` mean absolute contribution).
+The strongest scorecard IV feature is `PAY_0` (`0.8628`), followed by prior repayment-status variables. SHAP global importance for XGBoost also ranks `PAY_0` first (`0.4706` mean absolute contribution).
 
 ## Decision Threshold
 
@@ -37,9 +37,11 @@ The threshold is selected by expected cost, with a missed default costing 5x a w
 
 Expected profit is revenue from approved good accounts minus loss from approved defaulting accounts. Expected cost additionally counts declined good accounts as lost opportunity cost.
 
+Cost/profit values are per account in model cost units: one approved default costs 5 units and one wrongly declined good account costs 1 unit. In units of one default's loss, divide the table values by 5. At a €4,000 average loss per default and 1,000 applicants, the cost-based threshold's expected profit is about €185,200.
+
 ## Explainability
 
-Reason codes use XGBoost contribution values. Example declined applicant `ID 10745` has predicted default probability `88.5%`; top plain-language reasons are:
+Reason codes use XGBoost SHAP contribution values. Example declined applicant `ID 10745` has predicted default probability `88.5%`; top plain-language reasons are:
 
 1. Most recent repayment status shows delinquency or delayed payment.
 2. Prior-month repayment status shows delinquency or delayed payment.
